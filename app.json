@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Digital Footprint",
+    "slug": "digital-footprint",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F7F5EF"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.digitalfootprint.app"
+    },
+    "android": {
+      "package": "com.digitalfootprint.app"
+    }
+  }
+}
