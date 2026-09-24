@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Chicago Litter Map</title>
+
+  <link
+    href="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    header {
+      padding: 16px 20px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      color: #666;
+    }
+
+    #map {
+      width: 100%;
+      height: calc(100vh - 86px);
+    }
+
+    .report-button {
+      position: absolute;
+      bottom: 30px;
+      left: 20px;
+
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 10px;
+
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: bold;
+
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .report-button:hover {
+      background: #333;
+    }
+
+    .popup {
+      font-size: 14px;
+    }
+
+    .popup strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🗑️ Chicago Litter Map</h1>
+    <p>Report litter and see where cleanup is needed.</p>
+  </header>
+
+  <div id="map"></div>
+
+  <button class="report-button" onclick="reportLitter()">
+    + Report Litter
+  </button>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
+
+  <script>
+    // Your Mapbox public access token
+    mapboxgl.accessToken =
+      "TOKEN INTENTIONALLY LEFT OUT";
+
+
+    // --------------------------------------------------
+    // CREATE MAP
+    // --------------------------------------------------
+
+    const map = new mapboxgl.Map({
+      container: "map",
+
+      style: "mapbox://styles/mapbox/streets-v12",
+
+      center: [-87.6298, 41.8781],
+
+      zoom: 11
+    });
+
+
+    // --------------------------------------------------
+    // DUMMY LITTER DATA
+    // --------------------------------------------------
+
+    const litterReports = [
+      {
+        type: "Plastic bottle",
+        location: [-87.6298, 41.8781],
+        description: "Plastic bottle near sidewalk"
+      },
+
+      {
+        type: "Glass",
+        location: [-87.6359, 41.8892],
+        description: "Broken glass near curb"
+      },
+
+      {
+        type: "Food container",
+        location: [-87.6208, 41.8845],
+        description: "Takeout container"
+      },
+
+      {
+        type: "Can",
+        location: [-87.6500, 41.9000],
+        description: "Aluminum can"
+      }
+    ];
+
+
+    // --------------------------------------------------
+    // ADD LITTER MARKERS
+    // --------------------------------------------------
+
+    litterReports.forEach(function(report) {
+
+      const marker = new mapboxgl.Marker({
+        color: "#e63946"
+      })
+
+      .setLngLat(report.location)
+
+      .setPopup(
+        new mapboxgl.Popup()
+          .setHTML(`
+            <div class="popup">
+              <strong>🗑️ ${report.type}</strong>
+              ${report.description}
+            </div>
+          `)
+      )
+
+      .addTo(map);
+
+    });
+
+
+    // --------------------------------------------------
+    // REPORT LITTER
+    // --------------------------------------------------
+
+    function reportLitter() {
+
+      alert(
+        "Next step: click on the map to choose where the litter is."
+      );
+
+    }
+
+
+    // --------------------------------------------------
+    // CLICK MAP TO REPORT
+    // --------------------------------------------------
+
+    map.on("click", function(event) {
+
+      const longitude = event.lngLat.lng;
+      const latitude = event.lngLat.lat;
+
+      const confirmed = confirm(
+        "Report litter at this location?"
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      const type = prompt(
+        "What type of litter?\n\n" +
+        "1. Plastic\n" +
+        "2. Glass\n" +
+        "3. Can\n" +
+        "4. Paper\n" +
+        "5. Other"
+      );
+
+
+      if (!type) {
+        return;
+      }
+
+
+      new mapboxgl.Marker({
+        color: "#2a9d8f"
+      })
+
+      .setLngLat([
+        longitude,
+        latitude
+      ])
+
+      .setPopup(
+        new mapboxgl.Popup()
+          .setHTML(`
+            <div class="popup">
+              <strong>🗑️ ${type}</strong>
+              <div>
+                Reported just now
+              </div>
+            </div>
+          `)
+      )
+
+      .addTo(map);
+
+    });
+
+  </script>
+
+</body>
+</html>
