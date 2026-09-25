@@ -76,13 +76,13 @@ os.makedirs(CONFIG["output_dir"], exist_ok=True)
 # Device selection
 if torch.backends.mps.is_available():
     device = torch.device("mps")
-    print("✅ Using Apple Silicon MPS GPU")
+    print("Using Apple Silicon MPS GPU")
 elif torch.cuda.is_available():
     device = torch.device("cuda")
-    print("✅ Using CUDA GPU")
+    print("Using CUDA GPU")
 else:
     device = torch.device("cpu")
-    print("⚠️  Using CPU — training will be slow")
+    print("Using CPU — training will be slow")
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -308,7 +308,7 @@ def visualize_predictions(model, loader, device, epoch, out_dir, n=4):
     path = os.path.join(out_dir, f"predictions_epoch_{epoch:03d}.png")
     plt.savefig(path, dpi=120, bbox_inches="tight")
     plt.close()
-    print(f"  🖼  Predictions saved → {path}")
+    print(f" Predictions saved → {path}")
     return path
 
 
@@ -366,7 +366,7 @@ def plot_learning_curves(history, out_dir):
 # ───────────────────────────────────────────────────────────────────────────
 def run_sanity_checks(model, loader, criterion, cfg):
     print("\n" + "="*60)
-    print("🔍 PRE-TRAINING SANITY CHECKS")
+    print("PRE-TRAINING SANITY CHECKS")
     print("="*60)
 
     images, masks = next(iter(loader))
@@ -374,8 +374,8 @@ def run_sanity_checks(model, loader, criterion, cfg):
 
     # 1. Input range
     print(f"\n1. Input tensor range: [{images.min():.4f}, {images.max():.4f}]")
-    assert images.max() <= 5.0, "⚠️  Values seem very large — check normalisation!"
-    print("   ✅ Input range looks reasonable")
+    assert images.max() <= 5.0, "Values seem very large — check normalisation!"
+    print("Input range looks reasonable")
 
     # 2. Class distribution
     all_labels = []
@@ -383,7 +383,7 @@ def run_sanity_checks(model, loader, criterion, cfg):
         all_labels.extend(m.numpy().flatten())
     unique, counts = np.unique(all_labels, return_counts=True)
     print("\n2. Class distribution in dataset:")
-    cls_names = {0: "Background", 1: "Litter ⚠️", 2: "Other"}
+    cls_names = {0: "Background", 1: "Litter", 2: "Other"}
     for cls, cnt in zip(unique, counts):
         pct = cnt / len(all_labels) * 100
         print(f"   Class {cls} ({cls_names.get(cls, '?')}): {cnt:,} px  ({pct:.2f}%)")
@@ -392,7 +392,7 @@ def run_sanity_checks(model, loader, criterion, cfg):
     else:
         litter_pct = counts[list(unique).index(1)] / len(all_labels) * 100
         if litter_pct < 0.5:
-            print(f"   ⚠️  Litter is only {litter_pct:.2f}% of pixels — high class imbalance, weights are important")
+            print(f"Litter is only {litter_pct:.2f}% of pixels — high class imbalance, weights are important")
 
     # 3. Forward pass shape
     model.train()
@@ -400,7 +400,7 @@ def run_sanity_checks(model, loader, criterion, cfg):
         out = model(images)
     print(f"\n3. Output shape: {out.shape}  (expected: [{cfg['batch_size']}, {cfg['num_classes']}, H, W])")
     assert out.shape[1] == cfg["num_classes"], "❌ Output channels don't match num_classes!"
-    print("   ✅ Output shape correct")
+    print("Output shape correct")
 
     # 4. Single-batch overfit test
     print("\n4. Single-batch overfit test (loss should drop fast):")
@@ -418,9 +418,9 @@ def run_sanity_checks(model, loader, criterion, cfg):
         if step % 9 == 0:
             print(f"   Step {step+1:2d}: loss = {loss.item():.4f}")
     if loss.item() < start_loss * 0.5:
-        print("   ✅ Model can overfit a single batch — architecture OK")
+        print("Model can overfit a single batch — architecture OK")
     else:
-        print("   ⚠️  Loss didn't drop much — check learning rate or loss function")
+        print("Loss didn't drop much — check learning rate or loss function")
     del test_model, test_optim
 
     print("\n" + "="*60 + "\n")
@@ -579,7 +579,7 @@ def main():
             best_f1   = val_m["debris_f1"]
             no_improve = 0
             save_checkpoint(model, optimizer, epoch, val_m, ckpt_path)
-            print(f"  ⭐ New best Debris F1: {best_f1:.4f}")
+            print(f"  New best Debris F1: {best_f1:.4f}")
         else:
             no_improve += 1
             print(f"  No improvement for {no_improve}/{cfg['early_stop']} epochs")
@@ -592,12 +592,12 @@ def main():
     # ── Final plots ────────────────────────────────────────────────────────
     plot_learning_curves(history, cfg["output_dir"])
     total_mins = (time.time() - total_start) / 60
-    print(f"\n✅ Training complete in {total_mins:.1f} minutes")
+    print(f"\n Training complete in {total_mins:.1f} minutes")
     print(f"   Best Debris F1: {best_f1:.4f}")
     print(f"   Best model saved → {ckpt_path}")
 
     # ── Final test evaluation ──────────────────────────────────────────────
-    print("\n🧪 Final evaluation on held-out test set...")
+    print("\nFinal evaluation on held-out test set...")
     ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(ckpt["model"])
     test_loss, test_m = validate(model, test_loader, criterion, val_metrics)
