@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import { NavigationContainer, Theme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
