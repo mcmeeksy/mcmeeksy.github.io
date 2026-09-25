@@ -132,10 +132,10 @@ def main():
         combined.to_csv(OUTPUT_CSV, mode="a", header=not file_exists, index=False, encoding="utf-8")
         save_seen_ids(seen_ids)
 
-        print(f"\n✅ Saved {len(combined)} new job(s) to '{OUTPUT_CSV}'")
+        print(f"\n Saved {len(combined)} new job(s) to '{OUTPUT_CSV}'")
         print(f"   Total unique jobs tracked: {len(seen_ids)}")
     else:
-        print("\n✅ No new jobs found since last run.")
+        print("\n No new jobs found since last run.")
 
     print("\nTip: Schedule this script with cron (Mac/Linux) or Task Scheduler (Windows)")
     print("     to automatically check for new postings daily.")
